@@ -6,7 +6,8 @@ package ex
 import "net/http"
 
 type Engine struct {
-	router *Router
+	router      *Router
+	middlewares []HandlerFunc
 }
 
 // 实例化引擎
@@ -22,7 +23,12 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Writer: w,
 		Req:    r,
 	}
+	ctx.handlers = append(ctx.handlers, e.middlewares...)
 	e.router.handle(ctx)
+}
+
+func (e *Engine) Use(middlewares ...HandlerFunc) {
+	e.middlewares = append(e.middlewares, middlewares...)
 }
 
 // 启动一个http server

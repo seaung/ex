@@ -20,9 +20,14 @@ func NewRouter() *Router {
 func (rt *Router) handle(ctx *Context) {
 	key := ctx.Req.Method + "-" + ctx.Req.URL.Path
 	if handler, ok := rt.handlers[key]; ok {
-		handler(ctx)
-		return
+		ctx.handlers = append(ctx.handlers, handler)
+	} else {
+		ctx.handlers = append(ctx.handlers, func(ctx *Context) {
+			ctx.String(404, "404 NOT FOUND")
+		})
 	}
+	ctx.index = -1
+	ctx.Next()
 }
 
 // 用于注册用户路由操作
