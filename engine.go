@@ -32,10 +32,7 @@ func DefaultEngine() *Engine {
 
 // 必须实现ServeHTTP方法
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := &Context{
-		Writer: w,
-		Req:    r,
-	}
+	ctx := newContext(w, r)
 	e.router.handle(ctx)
 }
 
