@@ -1,15 +1,13 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/seaung/ex"
 )
 
 func main() {
 	engine := ex.NewEngine()
-	engine.GET("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello world"))
+	engine.GET("/hello", func(ctx *ex.Context) {
+		ctx.String(200, "hello world!!!")
 	})
 	engine.Run(":9527")
 }

@@ -18,7 +18,11 @@ func NewEngine() *Engine {
 
 // 必须实现ServeHTTP方法
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	e.router.handle(w, r)
+	ctx := &Context{
+		Writer: w,
+		Req:    r,
+	}
+	e.router.handle(ctx)
 }
 
 // 启动一个http server
@@ -27,6 +31,6 @@ func (e *Engine) Run(addr string) error {
 }
 
 // 实现http GET请求
-func (e *Engine) GET(path string, handler http.HandlerFunc) {
+func (e *Engine) GET(path string, handler HandlerFunc) {
 	e.router.addRoute("GET", path, handler)
 }
