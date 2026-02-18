@@ -6,9 +6,12 @@ package ex
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"reflect"
 	"strconv"
+
+	"github.com/gorilla/websocket"
 )
 
 type HandlerFunc func(*Context)
@@ -59,6 +62,31 @@ func (ctx *Context) Json(code int, obj any) {
 	enCoder := json.NewEncoder(ctx.Writer)
 	if err := enCoder.Encode(obj); err != nil {
 		http.Error(ctx.Writer, err.Error(), 500)
+	}
+}
+
+func (ctx *Context) SSEvent(event string, content any) {
+	ctx.Writer.Header().Set("Content-Type", "text/event-stream")
+	ctx.Writer.Header().Set("Cache-Control", "no-cache")
+	ctx.Writer.Header().Set("Connection", "keep-alive")
+
+	var payload string
+	switch v := content.(type) {
+	case string:
+		payload = v
+	default:
+		jsonByte, err := json.Marshal(v)
+		if err != nil {
+			payload = fmt.Sprintf("%v", v)
+		} else {
+			payload = string(jsonByte)
+		}
+	}
+	fmt.Fprintf(ctx.Writer, "event: %s\n", event)
+	fmt.Fprintf(ctx.Writer, "data: %s\n\n", payload)
+
+	if flusher, ok := ctx.Writer.(http.Flusher); ok {
+		flusher.Flush()
 	}
 }
 
@@ -135,5 +163,19 @@ func (ctx *Context) ShouldBindQuery(obj any) error {
 			return errors.New("nosupport type")
 		}
 	}
+	return nil
+}
+
+var wsUpgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool { return true },
+}
+
+func (ctx *Context) Websocket(handler func(*websocket.Conn)) error {
+	conn, err := wsUpgrader.Upgrade(ctx.Writer, ctx.Req, nil)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	handler(conn)
 	return nil
 }
