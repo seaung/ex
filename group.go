@@ -54,3 +54,25 @@ func (rg *RouterGroup) PUT(path string, handlers ...HandlerFunc) {
 	fullPath := rg.prefix + path
 	rg.addRoute("PUT", fullPath, handlers...)
 }
+
+func (rg *RouterGroup) OPTIONS(path string, handlers ...HandlerFunc) {
+	fullPath := rg.prefix + path
+	rg.addRoute("OPTIONS", fullPath, handlers...)
+}
+
+func (rg *RouterGroup) HEAD(path string, handlers ...HandlerFunc) {
+	fullPath := rg.prefix + path
+	rg.addRoute("HEAD", fullPath, handlers...)
+}
+
+func (rg *RouterGroup) PATCH(path string, handlers ...HandlerFunc) {
+	fullPath := rg.prefix + path
+	rg.addRoute("PATCH", fullPath, handlers...)
+}
+
+func (rg *RouterGroup) Any(path string, handlers ...HandlerFunc) {
+	methods := []string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"}
+	for _, method := range methods {
+		rg.addRoute(method, path, handlers...)
+	}
+}

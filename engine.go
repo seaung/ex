@@ -69,3 +69,18 @@ func (e *Engine) PUT(path string, handlers HandlerFunc) {
 func (e *Engine) DELETE(path string, handler HandlerFunc) {
 	e.RouterGroup.DELETE(path, handler)
 }
+
+// 实现http OPTIONS请求
+func (e *Engine) OPTIONS(path string, handler HandlerFunc) {
+	e.RouterGroup.OPTIONS(path, handler)
+}
+
+// 实现http HEAD请求
+func (e *Engine) HEAD(path string, handler HandlerFunc) {
+	e.RouterGroup.HEAD(path, handler)
+}
+
+// 实现http PATCH请求
+func (e *Engine) PATCH(path string, handler HandlerFunc) {
+	e.RouterGroup.PATCH(path, handler)
+}
