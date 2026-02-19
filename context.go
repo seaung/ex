@@ -65,6 +65,7 @@ func (ctx *Context) Json(code int, obj any) {
 	}
 }
 
+// serve sent evnet支持
 func (ctx *Context) SSEvent(event string, content any) {
 	ctx.Writer.Header().Set("Content-Type", "text/event-stream")
 	ctx.Writer.Header().Set("Cache-Control", "no-cache")
@@ -166,6 +167,7 @@ func (ctx *Context) ShouldBindQuery(obj any) error {
 	return nil
 }
 
+// websocket支持
 var wsUpgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }

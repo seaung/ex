@@ -1,14 +1,14 @@
 # EX
 
-EX 是一个基于 Go 标准库 `net/http` 扩展的轻量级 Web 框架。
+EX是一个基于Go标准库`net/http`扩展的轻量级Web框架。
 
 ## 特性
 
-- 🚀 轻量级，仅依赖 Go 标准库
-- 📦 支持路由分组
+- 🚀 轻量级，仅依赖Go标准库
+- 📦 支持路由分组，静态资源服务，Websocket和SSE
 - 🔧 中间件支持
-- 🛡️ 内置 Logger 和 Recovery 中间件
-- 🎯 简洁的 API 设计
+- 🛡️ 内置Logger，Recovery，跨域，Request ID，JWT等中间件
+- 🎯 简洁的API设计
 
 ## 安装
 
@@ -250,6 +250,7 @@ engine.Use(ex.Recovery())
 
 - [basic](./examples/basic) - 基础用法
 - [middlewares](./examples/middlewares) - 中间件使用
+- [controller](./examples/controller) - Controller使用
 
 ---
 that's all

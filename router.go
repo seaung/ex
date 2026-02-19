@@ -1,5 +1,11 @@
 package ex
 
+import (
+	"net/http"
+	ps "path"
+	"strings"
+)
+
 /*
  * ex框架的路由处理逻辑
  */
@@ -18,10 +24,19 @@ func newRouter() *Router {
 
 // 用户处理用户请求
 func (rt *Router) handle(ctx *Context) {
+	// 精确匹配路由
 	if methodMap, ok := rt.handlers[ctx.Req.Method]; ok {
 		if handler, ok := methodMap[ctx.Req.URL.Path]; ok {
 			handler(ctx)
 			return
+		}
+
+		// 用于匹配静态资源路由
+		for route, handler := range methodMap {
+			if strings.HasSuffix(route, "/*filepath") {
+				handler(ctx)
+				return
+			}
 		}
 	}
 	ctx.String(404, "404 NOT FOUND")
@@ -37,4 +52,23 @@ func (rt *Router) addRoute(method, path string, handlers []HandlerFunc) {
 		ctx.index = -1
 		ctx.Next()
 	}
+}
+
+func (rg *RouterGroup) createStaticHandler(path string, fs http.FileSystem) HandlerFunc {
+	fsv := http.StripPrefix(rg.prefix, http.FileServer(fs))
+	return func(ctx *Context) {
+		fsv.ServeHTTP(ctx.Writer, ctx.Req)
+	}
+}
+
+func (rg *RouterGroup) Static(path, root string) {
+	handler := rg.createStaticHandler(path, http.Dir(root))
+	urlPatten := ps.Join(path, "/*filepath")
+	rg.GET(urlPatten, handler)
+}
+
+func (rg *RouterGroup) StaticFS(path string, fs http.FileSystem) {
+	handler := rg.createStaticHandler(path, fs)
+	urlPattern := ps.Join(path, "/*filepath")
+	rg.GET(urlPattern, handler)
 }
