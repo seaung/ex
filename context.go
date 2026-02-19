@@ -7,9 +7,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -180,4 +182,23 @@ func (ctx *Context) Websocket(handler func(*websocket.Conn)) error {
 	defer conn.Close()
 	handler(conn)
 	return nil
+}
+
+func (ctx *Context) RealIP() string {
+	ip := ctx.Req.Header.Get("X-Forwarded-For")
+	if ip != "" {
+		ips := strings.Split(ip, ",")
+		return strings.TrimSpace(ips[0])
+	}
+
+	ip = ctx.Req.Header.Get("X-Real-IP")
+	if ip != "" {
+		return strings.TrimSpace(ip)
+	}
+
+	ip, _, err := net.SplitHostPort(ctx.Req.RemoteAddr)
+	if err != nil {
+		return ctx.Req.RemoteAddr
+	}
+	return ip
 }

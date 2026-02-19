@@ -23,6 +23,7 @@ func NewEngine() *Engine {
 	}
 
 	e.groups = []*RouterGroup{e.RouterGroup}
+	e.dispatcher = newDispatcher()
 	return e
 }
 
